@@ -1,0 +1,18 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: ms-scheduling
+  datasource:
+    password: 99168844Jo#
+    username: root
+    url: jdbc:mysql://localhost:3306/scheduling
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    defer-datasource-initialization: true
+
+
+
+
