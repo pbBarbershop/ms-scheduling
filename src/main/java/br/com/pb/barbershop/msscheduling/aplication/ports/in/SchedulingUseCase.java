@@ -16,7 +16,7 @@ public class SchedulingUseCase implements SchedulingService {
         this.schedulingRepository = schedulingRepository;
     }
 
-    @Override
+    /*@Override
     public Scheduling createScheduling(Scheduling scheduling) {
         //Lógica de Negócios
         return schedulingRepository.save(scheduling);
@@ -41,7 +41,7 @@ public class SchedulingUseCase implements SchedulingService {
     public Scheduling getScheduling(String schedulingId) {
         //Lógica de Negócios
         return schedulingRepository.findById(SchedulingId).get();
-    }
+    }*/
 
     @Override
     public List<Scheduling> getAllSchedulings() {

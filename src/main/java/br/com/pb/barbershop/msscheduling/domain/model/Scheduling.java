@@ -12,16 +12,14 @@ import lombok.Setter;
 public class Scheduling {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
+
+    @Column(name = "id")
+    private Long schedulingId;
     private String clientName;
     private String clientContact;
     private String clientEmail;
+
+    //private String ;
     //private LocalDate date;
 
-    public Scheduling(String clientName, String clientContact, String clientEmail) {
-        this.clientName = clientName;
-        this.clientContact = clientContact;
-        this.clientEmail = clientEmail;
-    }
 }
