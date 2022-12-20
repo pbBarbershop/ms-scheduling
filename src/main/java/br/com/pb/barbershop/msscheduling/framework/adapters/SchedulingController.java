@@ -1,8 +1,11 @@
 package br.com.pb.barbershop.msscheduling.framework.adapters;
 
+import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
 import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
+import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/scheduling")
 public class SchedulingController {
-    
 
     private final SchedulingService schedulingService;
 
@@ -41,11 +43,12 @@ public class SchedulingController {
     //     return "Scheduling Updated Successfully";
     // }
     //
-    // @DeleteMapping("/{SchedulingId}")
-    // public String deleteSchedulingDetails(String schedulingId) {
-    //     this.scheduling = scheduling;
-    //     return "Scheduling Deleted Successfully";
-    // }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+     public void delete(@PathVariable("id") Long id) {
+        schedulingService.delete(id);
+
+     }
 
 
 }

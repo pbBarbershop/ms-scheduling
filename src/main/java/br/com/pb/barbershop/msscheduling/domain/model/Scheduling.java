@@ -13,8 +13,8 @@ public class Scheduling {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    @Column(name = "id")
-    private Long schedulingId;
+    @Column(name = "ID")
+    private Long id;
     private String clientName;
     private String clientContact;
     private String clientEmail;
