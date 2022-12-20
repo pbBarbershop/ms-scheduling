@@ -2,51 +2,34 @@ package br.com.pb.barbershop.msscheduling.aplication.ports.in;
 
 import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingResponse;
 import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
+import br.com.pb.barbershop.msscheduling.framework.exception.DataIntegrityValidationException;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class SchedulingUseCase implements SchedulingService {
 
-    SchedulingRepository schedulingRepository;
+    private final SchedulingRepository schedulingRepository;
+    private final ModelMapper mapper;
 
-    public SchedulingUseCase(SchedulingRepository schedulingRepository) {
-        this.schedulingRepository = schedulingRepository;
-    }
 
-    @Override
-    public Scheduling createScheduling(Scheduling scheduling) {
-        //Lógica de Negócios
-        return schedulingRepository.save(scheduling);
-
-    }
 
     @Override
-    public String updateScheduling(Scheduling scheduling) {
-        //Lógica de Negócios
-        schedulingRepository.save(scheduling);
-        return "Success";
+    public SchedulingResponse createScheduling(SchedulingDTO schedulingDTO) {
+        var scheduling = mapper.map(schedulingDTO, Scheduling.class);
+        var schedulingOp = schedulingRepository.findByDate(schedulingDTO.getDate());
+
+        if(schedulingOp.isPresent()){
+            throw new DataIntegrityValidationException("Data para agendamento não disponível");
+        }
+        schedulingRepository.save(scheduling);;
+        return mapper.map(scheduling, SchedulingResponse.class);
     }
 
-    @Override
-    public String deleteScheduling(String schedulingId) {
-        //Lógica de Negócios
-        schedulingRepository.deleteById(schedulingId);
-        return "Success";
-    }
-
-    @Override
-    public Scheduling getScheduling(String schedulingId) {
-        //Lógica de Negócios
-        return schedulingRepository.findById(SchedulingId).get();
-    }
-
-    @Override
-    public List<Scheduling> getAllSchedulings() {
-        //Lógica de Negócios
-        return schedulingRepository.findAll();
-    }
 }
 

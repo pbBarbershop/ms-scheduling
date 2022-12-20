@@ -1,9 +1,12 @@
 package br.com.pb.barbershop.msscheduling.domain.model;
 
+import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,13 +18,11 @@ public class Scheduling {
     @Column(name = "ID")
     private Long id;
     private String clientName;
-    private String clientContact;
+    private String clientPhone;
     private String clientEmail;
-    //private LocalDate date;
+    private Status status = Status.AGUARDANDO_PAGAMENTO;
+    private LocalDateTime date;
+    private String barber;
 
-    public Scheduling(String clientName, String clientContact, String clientEmail) {
-        this.clientName = clientName;
-        this.clientContact = clientContact;
-        this.clientEmail = clientEmail;
-    }
+
 }
