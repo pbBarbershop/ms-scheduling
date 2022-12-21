@@ -1,10 +1,12 @@
 package br.com.pb.barbershop.msscheduling.framework.adapters;
 
-import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
+
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
-import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
-import jakarta.persistence.NoResultException;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,35 +20,15 @@ public class SchedulingController {
 
     private final SchedulingService schedulingService;
 
-    /*
-    @GetMapping("/{SchedulingId}")
-    public Scheduling getSchedulingDetails(String schedulingId) {
-       return scheduling;
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<SchedulingDTO> listSchedulings(SchedulingFilter schedulingFilter, Pageable pageable) {
+        return schedulingService.listSchedulings(schedulingFilter, pageable);
     }
-    */
-
-    // Todos os detalhes do agendamento no banco de dados
-    @GetMapping("/scheduling")
-    public ResponseEntity<List<Scheduling>> getAllSchedulingDetails() {
-        return ResponseEntity.ok(schedulingService.getAllSchedulings());
-    }
-
-    // @PostMapping("/")
-    // public SchedulingResponseDTO createSchedulingDetails(@RequestBody Scheduling scheduling) {
-    //     this.scheduling = scheduling;
-    //     return "Scheduling Updated Successfully";
-    // }
-    //
-    // @PutMapping("/")
-    // public String updateSchedulingDetails(@RequestBody Scheduling scheduling) {
-    //     this.scheduling = scheduling;
-    //     return "Scheduling Updated Successfully";
-    // }
-    //
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-     public void delete(@PathVariable("id") Long id) {
+    public ResponseEntity delete(@PathVariable Long id) {
         schedulingService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
      }
 

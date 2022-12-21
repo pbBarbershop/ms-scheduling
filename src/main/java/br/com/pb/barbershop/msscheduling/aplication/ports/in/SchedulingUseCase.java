@@ -2,22 +2,42 @@ package br.com.pb.barbershop.msscheduling.aplication.ports.in;
 
 import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingFilter;
 import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
 import br.com.pb.barbershop.msscheduling.framework.exception.ObjectNotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SchedulingUseCase implements SchedulingService {
 
-    SchedulingRepository schedulingRepository;
-    @Override
-    public List<Scheduling> getAllSchedulings() {
-        //Lógica de Negócios
-        return schedulingRepository.findAll();
+    private SchedulingRepository schedulingRepository;
+
+    private ModelMapper modelMapper;
+
+    public Page<SchedulingDTO> listSchedulings(SchedulingFilter schedulingFilter, Pageable pageable){
+        Scheduling scheduling = Scheduling.builder()
+                .id(schedulingFilter.getId())
+                .clientName(schedulingFilter.getClientName())
+                .clientEmail(schedulingFilter.getClientEmail())
+                .clientContact(schedulingFilter.getClientContact())
+                .dateScheduling(schedulingFilter.getDateScheduling())
+                .build();
+
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withIgnoreNullValues()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        Example<Scheduling> example = Example.of(scheduling, exampleMatcher);
+
+        return schedulingRepository.findAll(example, pageable);
     }
 
     @Override
