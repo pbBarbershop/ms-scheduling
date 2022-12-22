@@ -19,8 +19,6 @@ public class SchedulingUseCase implements SchedulingService {
 
     private SchedulingRepository schedulingRepository;
 
-    private ModelMapper modelMapper;
-
     public Page<SchedulingDTO> listSchedulings(SchedulingFilter schedulingFilter, Pageable pageable){
         Scheduling scheduling = Scheduling.builder()
                 .id(schedulingFilter.getId())
@@ -42,10 +40,11 @@ public class SchedulingUseCase implements SchedulingService {
 
     @Override
     public void delete(Long id) {
+        schedulingRepository.deleteById(id);
         if (schedulingRepository.existsById(id)) {
             throw new ObjectNotFoundException("Agendamento não encontrado", id);
         }
-        schedulingRepository.deleteById(id);
+
     }
 }
 
