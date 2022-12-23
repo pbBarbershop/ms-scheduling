@@ -21,14 +21,33 @@ public class SchedulingUseCase implements SchedulingService {
 
     @Override
     public SchedulingResponse createScheduling(SchedulingDTO schedulingDTO) {
+        schedulingValidation(schedulingDTO);
         var scheduling = mapper.map(schedulingDTO, Scheduling.class);
-        var schedulingOp = schedulingRepository.findByDate(schedulingDTO.getDate());
-
-        if(schedulingOp.isPresent()){
-            throw new DataIntegrityValidationException("Data para agendamento não disponível");
-        }
         schedulingRepository.save(scheduling);;
         return mapper.map(scheduling, SchedulingResponse.class);
+    }
+
+    private void schedulingValidation(SchedulingDTO schedulingDTO) {
+        var schedulingCheckOne = schedulingRepository.findByClientEmailAndDateAndTime(schedulingDTO.getClientEmail(),
+                schedulingDTO.getDate(), schedulingDTO.getTime());
+
+        if(schedulingCheckOne.isPresent()){
+            if(!schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())){
+                throw new DataIntegrityValidationException("Este cliente possui horário marcado com o barbeiro "+schedulingCheckOne.get().getBarberName());
+            }else if(schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())){
+                throw new DataIntegrityValidationException("Este cliente já possui agendamento para este barbeiro no mesmo horário!");
+            }
+        }
+        var schedulingCheckTwo = schedulingRepository.findByDateAndTimeAndBarberName(schedulingDTO.getDate()
+                , schedulingDTO.getTime(), schedulingDTO.getBarberName());
+
+        if(schedulingCheckTwo.isPresent()){
+            throw new DataIntegrityValidationException("horário de agendamento não disponivel para este barbeiro.");
+        }
+
+
+
+
     }
 
 }

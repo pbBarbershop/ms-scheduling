@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +17,7 @@ public class SchedulingResponse {
     private String clientPhone;
     private String clientEmail;
     private Status status;
-    private LocalDateTime date;
+    private LocalDate date;
+    private LocalTime time;
+    private String barberName;
 }
