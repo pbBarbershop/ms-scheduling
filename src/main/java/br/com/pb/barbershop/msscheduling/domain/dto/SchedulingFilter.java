@@ -1,29 +1,21 @@
-package br.com.pb.barbershop.msscheduling.domain.model;
+package br.com.pb.barbershop.msscheduling.domain.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-
-
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Entity
-public class Scheduling {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class SchedulingFilter {
 
-    @Column(name = "ID")
     private Long id;
     private String clientName;
     private String clientContact;
     private String clientEmail;
     private LocalDateTime dateScheduling;
-
-
 }

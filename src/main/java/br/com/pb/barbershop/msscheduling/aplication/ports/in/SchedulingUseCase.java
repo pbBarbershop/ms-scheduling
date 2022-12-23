@@ -2,51 +2,34 @@ package br.com.pb.barbershop.msscheduling.aplication.ports.in;
 
 import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
+import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
 import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
+import br.com.pb.barbershop.msscheduling.framework.exception.ObjectNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class SchedulingUseCase implements SchedulingService {
 
-    SchedulingRepository schedulingRepository;
+    private final SchedulingRepository repository;
 
-    public SchedulingUseCase(SchedulingRepository schedulingRepository) {
-        this.schedulingRepository = schedulingRepository;
-    }
+    private final ModelMapper mapper;
 
     @Override
-    public Scheduling createScheduling(Scheduling scheduling) {
-        //Lógica de Negócios
-        return schedulingRepository.save(scheduling);
-
+    public SchedulingDTO findById(Long id){
+        return mapper.map(getScheduling(id), SchedulingDTO.class);
     }
 
-    @Override
-    public String updateScheduling(Scheduling scheduling) {
-        //Lógica de Negócios
-        schedulingRepository.save(scheduling);
-        return "Success";
+    public Scheduling getScheduling(Long id){
+        Optional<Scheduling> scheduling = repository.findById(id);
+        return scheduling.orElseThrow(() -> new ObjectNotFoundException("ID não encontrado!"));
     }
 
-    @Override
-    public String deleteScheduling(String schedulingId) {
-        //Lógica de Negócios
-        schedulingRepository.deleteById(schedulingId);
-        return "Success";
-    }
-
-    @Override
-    public Scheduling getScheduling(String schedulingId) {
-        //Lógica de Negócios
-        return schedulingRepository.findById(SchedulingId).get();
-    }
-
-    @Override
-    public List<Scheduling> getAllSchedulings() {
-        //Lógica de Negócios
-        return schedulingRepository.findAll();
-    }
 }
+
 
