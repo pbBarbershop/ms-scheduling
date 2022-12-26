@@ -1,5 +1,6 @@
 package br.com.pb.barbershop.msscheduling.domain.dto;
 
+import br.com.pb.barbershop.msscheduling.domain.enums.Service;
 import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,4 +21,5 @@ public class SchedulingResponse {
     private LocalDate date;
     private LocalTime time;
     private String barberName;
+    private Service service;
 }

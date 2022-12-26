@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class SchedulingUseCase implements SchedulingService {
@@ -28,6 +30,9 @@ public class SchedulingUseCase implements SchedulingService {
     }
 
     private void schedulingValidation(SchedulingDTO schedulingDTO) {
+        if (LocalDate.now().isAfter(schedulingDTO.getDate())){
+            throw new DataIntegrityValidationException("Não é permitido data retroativa, digite uma data correta!");
+        }
         var schedulingCheckOne = schedulingRepository.findByClientEmailAndDateAndTime(schedulingDTO.getClientEmail(),
                 schedulingDTO.getDate(), schedulingDTO.getTime());
 
@@ -44,9 +49,6 @@ public class SchedulingUseCase implements SchedulingService {
         if(schedulingCheckTwo.isPresent()){
             throw new DataIntegrityValidationException("horário de agendamento não disponivel para este barbeiro.");
         }
-
-
-
 
     }
 

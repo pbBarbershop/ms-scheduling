@@ -11,6 +11,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+
+import br.com.pb.barbershop.msscheduling.domain.enums.Service;
 
 @Entity
 @Getter
@@ -31,6 +34,8 @@ public class Scheduling {
     private LocalDate date;
     private LocalTime time;
     private String barberName;
+    @Enumerated(EnumType.STRING)
+    private Service service;
 
 
 

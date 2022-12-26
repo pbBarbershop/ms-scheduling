@@ -1,6 +1,7 @@
 package br.com.pb.barbershop.msscheduling.domain.dto;
 
 
+import br.com.pb.barbershop.msscheduling.domain.enums.Service;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -30,12 +30,12 @@ public class SchedulingDTO {
     private String clientPhone;
     @Email
     private String clientEmail;
-    @NotBlank
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate date;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime time;
     @NotBlank
     private String barberName;
+    private Service service;
 
 }
