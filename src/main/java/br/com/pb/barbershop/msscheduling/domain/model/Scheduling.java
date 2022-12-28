@@ -8,8 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import br.com.pb.barbershop.msscheduling.domain.enums.Service;
 
-
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,10 +19,10 @@ public class Scheduling {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
-    private String clientName;
-    private String clientPhone;
+    private String customerName;
+    private String customerPhone;
     @Email
-    private String clientEmail;
+    private String customerEmail;
     @Enumerated(EnumType.STRING)
     private Status status = Status.AGUARDANDO_PAGAMENTO;
     private LocalDate date;

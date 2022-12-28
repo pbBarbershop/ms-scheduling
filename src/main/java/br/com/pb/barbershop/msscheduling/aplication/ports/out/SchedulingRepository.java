@@ -13,9 +13,9 @@ public interface SchedulingRepository extends JpaRepository<Scheduling, Long> {
 
     Optional<Scheduling> findByDateAndTimeAndBarberName(LocalDate date, LocalTime time, String barberName);
 
-    Optional<Scheduling> findByClientEmailAndDateAndTime(String clientEmail, LocalDate date, LocalTime time);
+    Optional<Scheduling> findByCustomerEmailAndDateAndTime(String clientEmail, LocalDate date, LocalTime time);
 
     Page<Scheduling> findAll(Example example, Pageable pageable);
 
-    Optional<Scheduling> findByClientEmail(String clientEmail);
+    Optional<Scheduling> findByCustomerName(String clientEmail);
 }

@@ -4,14 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
-import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
+import br.com.pb.barbershop.msscheduling.aplication.ports.in.SchedulingUseCase;
 import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
 import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
-import java.time.LocalDate;
-import java.time.LocalTime;
+
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,13 +19,12 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.test.context.SpringBootTest;
 
 @ExtendWith(MockitoExtension.class)
-public class SchedulingServiceTest {
+public class SchedulingUseCaseTest {
 
     @InjectMocks
-    private SchedulingService schedulingService;
+    private SchedulingUseCase schedulingService;
 
     @Mock
     private SchedulingRepository repository;

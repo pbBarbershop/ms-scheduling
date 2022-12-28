@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 @Data
@@ -20,12 +20,12 @@ public class SchedulingDTO {
     private Long id;
     @NotBlank(message = "invalid field")
     @Pattern(regexp = "^([a-zA-ZãÃéÉíÍóÓêÊôÔáÁ\s])+$", message = "field must contain letters only")
-    private String clientName;
+    private String customerName;
     @NotBlank(message = "invalid field")
     @Pattern(regexp = "^[0-9]{11}+$", message = "invalid phone number")
-    private String clientPhone;
+    private String customerPhone;
     @Email(message = "email address must be valid")
-    private String clientEmail;
+    private String customerEmail;
     @NotNull(message = "invalid field")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate date;
