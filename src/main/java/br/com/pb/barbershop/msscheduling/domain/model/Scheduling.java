@@ -33,3 +33,4 @@ public class Scheduling {
     @Enumerated(EnumType.STRING)
     private Service service;
 }
+

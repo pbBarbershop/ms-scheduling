@@ -10,9 +10,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SchedulingRepository extends JpaRepository<Scheduling, Long> {
     Optional<Scheduling> findByDate(LocalDate date);
-    Optional<Scheduling>findByDateAndTimeAndBarberName(LocalDate date, LocalTime time, String barberName);
+
+    Optional<Scheduling> findByDateAndTimeAndBarberName(LocalDate date, LocalTime time, String barberName);
 
     Optional<Scheduling> findByClientEmailAndDateAndTime(String clientEmail, LocalDate date, LocalTime time);
 
     Page<Scheduling> findAll(Example example, Pageable pageable);
+
+    Optional<Scheduling> findByClientEmail(String clientEmail);
 }

@@ -30,32 +30,34 @@ public class SchedulingUseCase implements SchedulingService {
     public SchedulingResponse createScheduling(SchedulingDTO schedulingDTO) {
         schedulingValidation(schedulingDTO);
         var scheduling = mapper.map(schedulingDTO, Scheduling.class);
-        repository.save(scheduling);;
+        repository.save(scheduling);
+        ;
         return mapper.map(scheduling, SchedulingResponse.class);
     }
 
     private void schedulingValidation(SchedulingDTO schedulingDTO) {
-        if (LocalDate.now().isAfter(schedulingDTO.getDate())){
+        if (LocalDate.now().isAfter(schedulingDTO.getDate())) {
             throw new DataIntegrityValidationException("Não é permitido data retroativa, digite uma data correta!");
         }
         var schedulingCheckOne = repository.findByClientEmailAndDateAndTime(schedulingDTO.getClientEmail(),
                 schedulingDTO.getDate(), schedulingDTO.getTime());
 
-        if(schedulingCheckOne.isPresent()){
-            if(!schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())){
-                throw new DataIntegrityValidationException("Este cliente possui horário marcado com o barbeiro "+schedulingCheckOne.get().getBarberName());
-            }else if(schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())){
+        if (schedulingCheckOne.isPresent()) {
+            if (!schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())) {
+                throw new DataIntegrityValidationException("Este cliente possui horário marcado com o barbeiro " + schedulingCheckOne.get().getBarberName());
+            } else if (schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())) {
                 throw new DataIntegrityValidationException("Este cliente já possui agendamento para este barbeiro no mesmo horário!");
             }
         }
         var schedulingCheckTwo = repository.findByDateAndTimeAndBarberName(schedulingDTO.getDate()
                 , schedulingDTO.getTime(), schedulingDTO.getBarberName());
 
-        if(schedulingCheckTwo.isPresent()){
+        if (schedulingCheckTwo.isPresent()) {
             throw new DataIntegrityValidationException("horário de agendamento não disponivel para este barbeiro.");
         }
 
     }
+
     @Override
     public Page<Scheduling> listSchedulings(SchedulingFilter schedulingFilter, Pageable pageable) {
         Scheduling scheduling = Scheduling.builder()
@@ -87,16 +89,39 @@ public class SchedulingUseCase implements SchedulingService {
         checkIfIdExists(id);
         repository.deleteById(id);
     }
+
     @Override
-    public SchedulingDTO findById(Long id){
+    public SchedulingDTO findById(Long id) {
         return mapper.map(getScheduling(id), SchedulingDTO.class);
     }
 
-    public Scheduling getScheduling(Long id){
+    public Scheduling getScheduling(Long id) {
         Optional<Scheduling> scheduling = repository.findById(id);
         return scheduling.orElseThrow(() -> new ObjectNotFoundException("ID não encontrado!"));
     }
 
+    @Override
+    public Scheduling update(Long id, SchedulingDTO request) {
+        this.checkIfIdExists(id);
+        request.setId(id);
+        this.findByEmail(request);
+        Optional<Scheduling> optional = repository.findById(id);
+        Scheduling scheduling = optional.get();
+        scheduling.setClientName(request.getClientName());
+        scheduling.setClientPhone(request.getClientPhone());
+        scheduling.setClientEmail(request.getClientEmail());
+        scheduling.setDate(request.getDate());
+        scheduling.setTime(request.getTime());
+        scheduling.setBarberName(request.getBarberName());
+        repository.save(scheduling);
+        return mapper.map(scheduling, Scheduling.class);
+    }
+
+    private void findByEmail(SchedulingDTO request) {
+        Optional<Scheduling> scheduling = repository.findByClientEmail(request.getClientEmail());
+        if (scheduling.isPresent() && !scheduling.get().getId().equals(request.getId())) {
+            throw new DataIntegrityValidationException("Email já está em uso.");
+        }
+
+    }
 }
-
-

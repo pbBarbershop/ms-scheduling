@@ -46,8 +46,9 @@ public class SchedulingController {
     @GetMapping("/{id}")
     public ResponseEntity<SchedulingDTO>findById(@PathVariable Long id){
         return ResponseEntity.ok().body(schedulingUseCase.findById(id));
-
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Scheduling> update(@PathVariable Long id, @RequestBody @Valid SchedulingDTO request) {
+        return ResponseEntity.ok().body(schedulingService.update(id, request));
     }
 }
-
-

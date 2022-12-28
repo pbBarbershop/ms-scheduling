@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8082
   servlet:
     context-path: /api/barbershop
 spring:
@@ -7,10 +7,10 @@ spring:
     name: ms-scheduling
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ms_scheduling?createDatabaseIfNotExist=true
-    username: root
-    password: michelflava 
 
+    url: jdbc:mysql://localhost:3306/ms_scheduling?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: root
+    password: 99168844Jo#
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,3 +22,4 @@ springdoc:
   swagger-ui:
     operations-sorter: method
     path: /swagger-ui.html
+

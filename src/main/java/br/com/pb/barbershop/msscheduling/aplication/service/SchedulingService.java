@@ -14,4 +14,8 @@ public interface SchedulingService {
 
 
     public SchedulingDTO findById(Long id);
+
+    public Scheduling update(Long id, SchedulingDTO request);
 }
+
+

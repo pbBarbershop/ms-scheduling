@@ -1,5 +1,4 @@
 package br.com.pb.barbershop.msscheduling.framework.mapper;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,3 +10,4 @@ public class MapperConfig {
         return new ModelMapper();
     }
 }
+

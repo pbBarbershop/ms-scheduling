@@ -1,5 +1,4 @@
 package br.com.pb.barbershop.msscheduling.framework.exception;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -48,5 +47,14 @@ public class SchedulingExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-
+    @ExceptionHandler(IdNotFoundException.class)
+    public ResponseEntity<StandartError> idNotFound(IdNotFoundException ex, HttpServletRequest request) {
+        StandartError error = new StandartError(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 }
