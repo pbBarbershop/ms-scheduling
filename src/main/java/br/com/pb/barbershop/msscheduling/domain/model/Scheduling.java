@@ -1,25 +1,21 @@
 package br.com.pb.barbershop.msscheduling.domain.model;
-
 import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-
 import br.com.pb.barbershop.msscheduling.domain.enums.Service;
 
-@Entity
+
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
 public class Scheduling {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +32,4 @@ public class Scheduling {
     private String barberName;
     @Enumerated(EnumType.STRING)
     private Service service;
-
-
-
 }

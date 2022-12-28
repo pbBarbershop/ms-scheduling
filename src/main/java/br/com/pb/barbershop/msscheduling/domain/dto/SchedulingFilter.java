@@ -1,19 +1,28 @@
 package br.com.pb.barbershop.msscheduling.domain.dto;
+
 import br.com.pb.barbershop.msscheduling.domain.enums.Service;
+import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-@Data
-@NoArgsConstructor
+
+@Getter
+@Setter
 @AllArgsConstructor
-public class SchedulingDTO {
+@NoArgsConstructor
+public class SchedulingFilter {
     @NotBlank
     @Pattern(regexp = "^([a-zA-ZãÃéÉíÍóÓêÊôÔáÁ\s])+$", message =
             "Nome deve conter apenas letras e não deve ser em branco.")
