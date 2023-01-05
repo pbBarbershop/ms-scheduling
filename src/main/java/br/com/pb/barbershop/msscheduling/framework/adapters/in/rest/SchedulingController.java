@@ -1,5 +1,6 @@
 package br.com.pb.barbershop.msscheduling.framework.adapters.in.rest;
 
+import br.com.pb.barbershop.msscheduling.aplication.ports.in.SchedulingUseCase;
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
 import br.com.pb.barbershop.msscheduling.domain.dto.PageableDTO;
 import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SchedulingController {
 
-    private final SchedulingService schedulingService;
+    private final SchedulingUseCase schedulingService;
 
     @PostMapping
     public ResponseEntity<SchedulingDTO> create(@RequestBody @Valid SchedulingDTO scheduling) {

@@ -28,7 +28,7 @@ public class SchedulingDTO {
 
     private Status status;
 
-    @NotNull(message = "invalid field")
+    @NotNull(message = "Campo inválido")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime dateTime;
 
