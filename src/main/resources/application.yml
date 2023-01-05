@@ -6,11 +6,16 @@ spring:
   application:
     name: ms-scheduling
   datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
-
-    url: jdbc:mysql://localhost:3306/ms_scheduling?createDatabaseIfNotExist=true&serverTimezone=UTC
-    username: root
-    password: 99168844Jo#
+    scheduling:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ms_scheduling?createDatabaseIfNotExist=true&serverTimezone=UTC
+      username: root
+      password: root
+    user:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ms_user?createDatabaseIfNotExist=true&serverTimezone=UTC
+      username: root
+      password: root
   jpa:
     hibernate:
       ddl-auto: update

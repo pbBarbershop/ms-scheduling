@@ -1,37 +1,36 @@
-package br.com.pb.barbershop.msscheduling.domain.dto;
+package br.com.pb.barbershop.msscheduling.domain.model.scheduling;
 
 import br.com.pb.barbershop.msscheduling.domain.enums.Service;
 import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SchedulingDTO {
+@Entity
+public class Scheduling {
 
-    @NotNull
-    @JsonDeserialize(as = Long.class)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long id;
+
     private Long customerId;
 
-    @NotNull
-    @JsonDeserialize(as = Long.class)
     private Long barberId;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
-    @NotNull(message = "invalid field")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime dateTime;
 
+    @Enumerated(EnumType.STRING)
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     private Service service;
 }

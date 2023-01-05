@@ -1,91 +1,84 @@
 package br.com.pb.barbershop.msscheduling.aplication.service;
-import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepository;
+
 import br.com.pb.barbershop.msscheduling.aplication.ports.in.SchedulingUseCase;
+import br.com.pb.barbershop.msscheduling.aplication.ports.out.SchedulingRepositoryPortOut;
+import br.com.pb.barbershop.msscheduling.aplication.ports.out.UserRepositoryPortOut;
+import br.com.pb.barbershop.msscheduling.domain.dto.PageableDTO;
 import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
 import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingFilter;
-import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingResponse;
-import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
-import br.com.pb.barbershop.msscheduling.framework.exception.DataIntegrityValidationException;
-import br.com.pb.barbershop.msscheduling.framework.exception.IdNotFoundException;
-import br.com.pb.barbershop.msscheduling.framework.exception.ObjectNotFoundException;
+import br.com.pb.barbershop.msscheduling.domain.enums.Status;
+import br.com.pb.barbershop.msscheduling.domain.model.scheduling.Scheduling;
+import br.com.pb.barbershop.msscheduling.framework.exception.GenericException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
 public class SchedulingService implements SchedulingUseCase {
 
-    private final SchedulingRepository repository;
+    private final SchedulingRepositoryPortOut schedulingRepository;
+
+    private final UserRepositoryPortOut userRepository;
     private final ModelMapper mapper;
 
     @Override
-    public SchedulingResponse createScheduling(SchedulingDTO schedulingDTO) {
+    public SchedulingDTO create(SchedulingDTO schedulingDTO) {
+        if (schedulingDTO.getCustomerId() != null && checkIfUserIdExists(schedulingDTO.getCustomerId())) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente não existe.");
+        }
+
+        if (schedulingDTO.getBarberId() != null && checkIfUserIdExists(schedulingDTO.getBarberId())) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro não existe.");
+        }
+
         schedulingValidation(schedulingDTO);
+
         var scheduling = mapper.map(schedulingDTO, Scheduling.class);
-        repository.save(scheduling);
-        ;
-        return mapper.map(scheduling, SchedulingResponse.class);
-    }
+        scheduling.setStatus(Status.AGUARDANDO_PAGAMENTO);
 
-    private void schedulingValidation(SchedulingDTO schedulingDTO) {
-        if (LocalDate.now().isAfter(schedulingDTO.getDate())) {
-            throw new DataIntegrityValidationException("Não é permitido data retroativa, digite uma data correta!");
-        }
-        var schedulingCheckOne = repository.findByCustomerEmailAndDateAndTime(schedulingDTO.getCustomerEmail(),
-                schedulingDTO.getDate(), schedulingDTO.getTime());
-
-        if (schedulingCheckOne.isPresent()) {
-            if (!schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())) {
-                throw new DataIntegrityValidationException("Este cliente possui horário marcado com o barbeiro " + schedulingCheckOne.get().getBarberName());
-            } else if (schedulingCheckOne.get().getBarberName().equals(schedulingDTO.getBarberName())) {
-                throw new DataIntegrityValidationException("Este cliente já possui agendamento para este barbeiro no mesmo horário!");
-            }
-        }
-        var schedulingCheckTwo = repository.findByDateAndTimeAndBarberName(schedulingDTO.getDate()
-                , schedulingDTO.getTime(), schedulingDTO.getBarberName());
-
-        if (schedulingCheckTwo.isPresent()) {
-            throw new DataIntegrityValidationException("horário de agendamento não disponivel para este barbeiro.");
-        }
-
+        schedulingRepository.save(scheduling);
+        return mapper.map(scheduling, SchedulingDTO.class);
     }
 
     @Override
-    public Page<Scheduling> listSchedulings(SchedulingFilter schedulingFilter, Pageable pageable) {
-        Scheduling scheduling = Scheduling.builder()
-                .id(schedulingFilter.getId())
-                .customerName(schedulingFilter.getCustomerName())
-                .customerEmail(schedulingFilter.getCustomerEmail())
-                .customerPhone(schedulingFilter.getCustomerPhone())
-                .date(schedulingFilter.getDate())
-                .build();
+    public PageableDTO findAll(SchedulingFilter schedulingFilter, Pageable pageable) {
+        ExampleMatcher exampleMatcher = ExampleMatcher
+            .matching()
+            .withIgnoreNullValues()
+            .withIgnoreCase()
+            .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
-        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withIgnoreNullValues()
-                .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Scheduling scheduling = Scheduling
+            .builder()
+            .customerId(schedulingFilter.getCustomerId())
+            .barberId(schedulingFilter.getBarberId())
+            .dateTime(schedulingFilter.getDateTime())
+            .service(schedulingFilter.getService())
+            .build();
 
         Example<Scheduling> example = Example.of(scheduling, exampleMatcher);
 
-        return repository.findAll(example, pageable);
-    }
+        Page schedulingPage = schedulingRepository.findAll(example, pageable);
 
-    private void checkIfIdExists(Long id) {
-        repository.findById(id).orElseThrow(() -> new IdNotFoundException(id));
-    }
+        List<Scheduling> schedulings = schedulingPage.getContent();
 
-    @Override
-    public void delete(Long id) {
-        checkIfIdExists(id);
-        repository.deleteById(id);
+        return PageableDTO
+            .builder()
+            .numberOfElements(schedulingPage.getNumberOfElements())
+            .totalElements(schedulingPage.getTotalElements())
+            .totalPages(schedulingPage.getTotalPages())
+            .schedulingList(schedulings)
+            .build();
     }
 
     @Override
@@ -93,33 +86,90 @@ public class SchedulingService implements SchedulingUseCase {
         return mapper.map(getScheduling(id), SchedulingDTO.class);
     }
 
-    public Scheduling getScheduling(Long id) {
-        Optional<Scheduling> scheduling = repository.findById(id);
-        return scheduling.orElseThrow(() -> new ObjectNotFoundException("ID não encontrado!"));
-    }
-
     @Override
     public Scheduling update(Long id, SchedulingDTO request) {
-        this.checkIfIdExists(id);
-        request.setId(id);
-        this.findByEmail(request);
-        Optional<Scheduling> optional = repository.findById(id);
+        schedulingValidation(request);
+        Optional<Scheduling> optional = schedulingRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Agendamento não existe.");
+        }
         Scheduling scheduling = optional.get();
-        scheduling.setCustomerName(request.getCustomerName());
-        scheduling.setCustomerPhone(request.getCustomerPhone());
-        scheduling.setCustomerEmail(request.getCustomerEmail());
-        scheduling.setDate(request.getDate());
-        scheduling.setTime(request.getTime());
-        scheduling.setBarberName(request.getBarberName());
-        repository.save(scheduling);
+        scheduling.setDateTime(request.getDateTime() == null ? scheduling.getDateTime() : request.getDateTime());
+
+        if (request.getCustomerId() != null && checkIfUserIdExists(request.getCustomerId())) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente não existe.");
+        }
+
+        if (request.getBarberId() != null && checkIfUserIdExists(request.getBarberId())) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro não existe.");
+        }
+
+        schedulingRepository.save(scheduling);
         return mapper.map(scheduling, Scheduling.class);
     }
 
-    private void findByEmail(SchedulingDTO request) {
-        Optional<Scheduling> scheduling = repository.findByCustomerName(request.getCustomerEmail());
-        if (scheduling.isPresent() && !scheduling.get().getId().equals(request.getId())) {
-            throw new DataIntegrityValidationException("Email já está em uso.");
+    @Override
+    public void delete(Long id) {
+        checkIfIdExists(id);
+        schedulingRepository.deleteById(id);
+    }
+
+    private void schedulingValidation(SchedulingDTO schedulingDTO) {
+        if (LocalDateTime.now().isAfter(schedulingDTO.getDateTime())) {
+            throw new GenericException(
+                HttpStatus.BAD_REQUEST,
+                "Não é permitido data retroativa, digite uma data correta!"
+            );
         }
 
+        var scheduledMinus = schedulingDTO.getDateTime().minus(30, ChronoUnit.MINUTES);
+        var scheduledPlus = schedulingDTO.getDateTime().plus(30, ChronoUnit.MINUTES);
+        var customerIsAlreadyScheduled = schedulingRepository.findByCustomerIdAndDateTimeLessThanAndDateTimeGreaterThan(
+            schedulingDTO.getCustomerId(),
+            scheduledPlus,
+            scheduledMinus
+        );
+
+        if (customerIsAlreadyScheduled.isPresent()) {
+            if (!customerIsAlreadyScheduled.get().getBarberId().equals(schedulingDTO.getBarberId())) {
+                throw new GenericException(
+                    HttpStatus.BAD_REQUEST,
+                    "Este cliente possui horário marcado com o barbeiro " +
+                    customerIsAlreadyScheduled.get().getBarberId()
+                );
+            } else if (customerIsAlreadyScheduled.get().getBarberId().equals(schedulingDTO.getBarberId())) {
+                throw new GenericException(
+                    HttpStatus.BAD_REQUEST,
+                    "Este cliente já possui agendamento com barbeiro no mesmo horário!"
+                );
+            }
+        }
+        var barberIsAlreadyScheduled = schedulingRepository.findByBarberIdAndDateTimeLessThanAndDateTimeGreaterThan(
+            schedulingDTO.getBarberId(),
+            scheduledPlus,
+            scheduledMinus
+        );
+
+        if (barberIsAlreadyScheduled.isPresent()) {
+            throw new GenericException(
+                HttpStatus.BAD_REQUEST,
+                "Horário de agendamento não disponivel para este barbeiro."
+            );
+        }
+    }
+
+    private void checkIfIdExists(Long id) {
+        schedulingRepository
+            .findById(id)
+            .orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Id não encontrado!"));
+    }
+
+    private Boolean checkIfUserIdExists(Long userId) {
+        return userRepository.findById(userId).isEmpty();
+    }
+
+    private Scheduling getScheduling(Long id) {
+        Optional<Scheduling> scheduling = schedulingRepository.findById(id);
+        return scheduling.orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Id não encontrado!"));
     }
 }

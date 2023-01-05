@@ -1,58 +1,65 @@
 package br.com.pb.barbershop.msscheduling.framework.exception;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+@ControllerAdvice
+public class SchedulingExceptionHandler extends ResponseEntityExceptionHandler {
 
-@RestControllerAdvice
-@RequiredArgsConstructor
-public class SchedulingExceptionHandler {
-    private final MessageSource messageSource;
-    @ExceptionHandler(ObjectNotFoundException.class)
-    public ResponseEntity<StandardError> objectNotFound(ObjectNotFoundException ex, HttpServletRequest request) {
-        StandardError error = new StandardError
-                (LocalDateTime.now(), HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+        Exception ex,
+        Object body,
+        HttpHeaders headers,
+        HttpStatusCode statusCode,
+        WebRequest request
+    ) {
+        var errorResponse = ErrorResponse.builder().message(ex.getMessage()).build();
+        return new ResponseEntity<>(errorResponse, statusCode);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
-        List<ValidationException> errorList = new ArrayList<>();
-        List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
-        fieldErrors.forEach(e -> {
-            String message = messageSource.getMessage(e, LocaleContextHolder.getLocale());
-            ValidationException error = new ValidationException(e.getField(), message);
-            errorList.add(error);
-        });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorList);
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request
+    ) {
+        String badRequestMessage;
+        if (
+            ex.getBindingResult().getFieldError() != null &&
+            ex.getBindingResult().getFieldError().getDefaultMessage() != null
+        ) {
+            badRequestMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
+        } else {
+            badRequestMessage = HttpStatus.BAD_REQUEST.getReasonPhrase();
+        }
+        var error = ErrorResponse.builder().message(badRequestMessage).build();
+        return new ResponseEntity<>(error, status);
     }
 
-    @ExceptionHandler(DataIntegrityValidationException.class)
-    public ResponseEntity<StandardError> dataIntegrityViolationException
-            (DataIntegrityValidationException ex, HttpServletRequest request) {
-        StandardError error = new StandardError
-                (LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    @ExceptionHandler({ Exception.class })
+    public ResponseEntity<Object> handle(Exception ex) {
+        if (ex instanceof GenericException) {
+            return handleGenericException(((GenericException) ex));
+        }
+        return handleDefault();
     }
 
-    @ExceptionHandler(IdNotFoundException.class)
-    public ResponseEntity<StandartError> idNotFound(IdNotFoundException ex, HttpServletRequest request) {
-        StandartError error = new StandartError(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    private ResponseEntity<Object> handleDefault() {
+        var errorResponse = ErrorResponse.builder().message(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()).build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<Object> handleGenericException(GenericException ex) {
+        var errorResponse = ErrorResponse.builder().message(ex.getMessageDTO()).build();
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
     }
 }
