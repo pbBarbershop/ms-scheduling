@@ -1,0 +1,341 @@
+openapi: 3.0.1
+info:
+  title: MS Scheduling
+  description: Microsserviço de gerenciamento de agendamento da barbearia
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081/api/barbershop
+paths:
+  /scheduling/{id}:
+    get:
+      tags:
+        - Scheduling
+      summary: Buscar agendamento por ID
+      operationId: findById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SchedulingDTO'
+    put:
+      tags:
+        - Scheduling
+      summary: Atualizar agendamento
+      operationId: update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchedulingDTO'
+        required: true
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Scheduling'
+        '400':
+          description: Dados incorretos
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Scheduling'
+        '500':
+          description: Erro ao processar informação
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Scheduling'
+    delete:
+      tags:
+        - Scheduling
+      summary: Excluir agendamento
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Sucesso
+          content:
+            '*/*':
+              schema:
+                type: string
+        '400':
+          description: Agendamento não existe no banco de dados
+          content:
+            '*/*':
+              schema:
+                type: string
+  /scheduling:
+    get:
+      tags:
+        - Scheduling
+      summary: Listar agendamento
+      operationId: listSchedulings
+      parameters:
+        - name: schedulingFilter
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/SchedulingFilter'
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+          
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageScheduling'
+    post:
+      tags:
+        - Scheduling
+      summary: Cadastrar agendamento
+      operationId: createScheduling
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchedulingDTO'
+        required: true
+      responses:
+        '201':
+          description: Sucesso
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SchedulingResponse'
+        '400':
+          description: Dados incorretos
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SchedulingResponse'
+        '500':
+          description: Erro ao processar informação
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SchedulingResponse'
+components:
+  schemas:
+    LocalTime:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+    SchedulingDTO:
+      required:
+        - barberName
+        - customerName
+        - customerPhone
+        - date
+        - time
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerName:
+          pattern: ^([a-zA-ZãÃéÉíÍóÓêÊôÔáÁ ])+$
+          type: string
+        customerPhone:
+          pattern: ^[0-9]{11}+$
+          type: string
+        customerEmail:
+          type: string
+        date:
+          type: string
+          format: date
+        time:
+          $ref: '#/components/schemas/LocalTime'
+        barberName:
+          type: string
+        service:
+          type: string
+          enum:
+            - CABELO
+            - BARBA
+            - CABELO_BARBA
+    Scheduling:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        customerPhone:
+          type: string
+        customerEmail:
+          type: string
+        status:
+          type: string
+          enum:
+            - AGENDADO
+            - AGUARDANDO_PAGAMENTO
+        date:
+          type: string
+          format: date
+        time:
+          $ref: '#/components/schemas/LocalTime'
+        barberName:
+          type: string
+        service:
+          type: string
+          enum:
+            - CABELO
+            - BARBA
+            - CABELO_BARBA
+    SchedulingResponse:
+      type: object
+      properties:
+        customerName:
+          type: string
+        customerPhone:
+          type: string
+        customerEmail:
+          type: string
+        status:
+          type: string
+          enum:
+            - AGENDADO
+            - AGUARDANDO_PAGAMENTO
+        date:
+          type: string
+          format: date
+        time:
+          $ref: '#/components/schemas/LocalTime'
+        barberName:
+          type: string
+        service:
+          type: string
+          enum:
+            - CABELO
+            - BARBA
+            - CABELO_BARBA
+    SchedulingFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        customerPhone:
+          type: string
+        customerEmail:
+          type: string
+        date:
+          type: string
+          format: date
+    Pageable:
+      type: object
+      properties:
+        page:
+          minimum: 0
+          type: integer
+          format: int32
+        size:
+          minimum: 1
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            type: string
+    PageScheduling:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scheduling'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
