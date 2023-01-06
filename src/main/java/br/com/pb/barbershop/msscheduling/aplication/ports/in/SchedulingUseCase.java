@@ -13,7 +13,7 @@ public interface SchedulingUseCase {
 
     public SchedulingDTO findById(Long id);
 
-    public Scheduling update(Long id, SchedulingDTO request);
+    public SchedulingDTO update(Long id, SchedulingDTO request);
 
     public void delete(Long id);
 }

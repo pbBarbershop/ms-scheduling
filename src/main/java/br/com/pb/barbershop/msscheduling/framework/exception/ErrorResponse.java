@@ -1,10 +1,9 @@
 package br.com.pb.barbershop.msscheduling.framework.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder

@@ -1,13 +1,12 @@
 package br.com.pb.barbershop.msscheduling.aplication.ports.out;
 
 import br.com.pb.barbershop.msscheduling.domain.model.scheduling.Scheduling;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Repository
 public interface SchedulingRepositoryPortOut {

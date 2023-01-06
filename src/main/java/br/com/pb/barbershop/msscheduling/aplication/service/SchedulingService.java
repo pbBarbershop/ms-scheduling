@@ -33,11 +33,10 @@ public class SchedulingService implements SchedulingUseCase {
 
     @Override
     public SchedulingDTO create(SchedulingDTO schedulingDTO) {
-        if (schedulingDTO.getCustomerId() != null && checkIfUserIdExists(schedulingDTO.getCustomerId())) {
+        if (schedulingDTO.getCustomerId() == null || !checkIfUserIdExists(schedulingDTO.getCustomerId())) {
             throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente não existe.");
         }
-
-        if (schedulingDTO.getBarberId() != null && checkIfUserIdExists(schedulingDTO.getBarberId())) {
+        if (schedulingDTO.getBarberId() == null || !checkIfUserIdExists(schedulingDTO.getBarberId())) {
             throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro não existe.");
         }
 
@@ -87,7 +86,7 @@ public class SchedulingService implements SchedulingUseCase {
     }
 
     @Override
-    public Scheduling update(Long id, SchedulingDTO request) {
+    public SchedulingDTO update(Long id, SchedulingDTO request) {
         schedulingValidation(request);
         Optional<Scheduling> optional = schedulingRepository.findById(id);
         if (optional.isEmpty()) {
@@ -96,16 +95,16 @@ public class SchedulingService implements SchedulingUseCase {
         Scheduling scheduling = optional.get();
         scheduling.setDateTime(request.getDateTime() == null ? scheduling.getDateTime() : request.getDateTime());
 
-        if (request.getCustomerId() != null && checkIfUserIdExists(request.getCustomerId())) {
+        if (request.getCustomerId() == null || !checkIfUserIdExists(request.getCustomerId())) {
             throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente não existe.");
         }
 
-        if (request.getBarberId() != null && checkIfUserIdExists(request.getBarberId())) {
+        if (request.getBarberId() == null || !checkIfUserIdExists(request.getBarberId())) {
             throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro não existe.");
         }
 
         schedulingRepository.save(scheduling);
-        return mapper.map(scheduling, Scheduling.class);
+        return mapper.map(scheduling, SchedulingDTO.class);
     }
 
     @Override
@@ -165,7 +164,7 @@ public class SchedulingService implements SchedulingUseCase {
     }
 
     private Boolean checkIfUserIdExists(Long userId) {
-        return userRepository.findById(userId).isEmpty();
+        return userRepository.findById(userId).isPresent();
     }
 
     private Scheduling getScheduling(Long id) {
