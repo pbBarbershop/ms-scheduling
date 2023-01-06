@@ -1,7 +1,7 @@
 # MS Scheduling
 
 
-- URL: http://localhost:8081/api/barbershop/scheduling
+- URL: http://localhost:8082/api/barbershop/scheduling
 - [Swagger - OpenAPI](https://github.com/pbBarbershop/ms-user/blob/master/src/main/resources/openapi.yaml)
 - MySQL Workbench
 - [Dockerfile](https://github.com/pbBarbershop/ms-scheduling/blob/master/Dockerfile)
