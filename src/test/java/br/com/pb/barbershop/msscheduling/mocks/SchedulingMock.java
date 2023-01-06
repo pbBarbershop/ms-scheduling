@@ -31,4 +31,14 @@ public class SchedulingMock {
             .service(Service.CABELO)
             .build();
     }
+
+    public static User getUserMock() {
+        return User.builder()
+                .id(1L)
+                .name("João")
+                .email("joao@mail.com")
+                .phone("55985082020")
+                .build();
+    }
 }
+

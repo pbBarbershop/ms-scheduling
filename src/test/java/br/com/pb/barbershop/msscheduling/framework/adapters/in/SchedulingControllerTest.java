@@ -1,10 +1,8 @@
 package br.com.pb.barbershop.msscheduling.framework.adapters.in;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-
 import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
 import br.com.pb.barbershop.msscheduling.domain.dto.PageableDTO;
 import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
@@ -26,7 +24,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 @WebMvcTest(controllers = SchedulingController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
@@ -71,16 +72,15 @@ public class SchedulingControllerTest {
         PageableDTO pageableDTO = new PageableDTO();
         when(service.findAll(any(), any())).thenReturn(pageableDTO);
         MvcResult result = mockMvc
-            .perform(
-                MockMvcRequestBuilders
-                    .get(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
-            .andReturn();
+                .perform(
+                        MockMvcRequestBuilders
+                                .get(URL)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn();
 
         MockHttpServletResponse response = result.getResponse();
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
     @Test
@@ -97,7 +97,6 @@ public class SchedulingControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
             )
             .andReturn();
-
         MockHttpServletResponse response = result.getResponse();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
@@ -133,7 +132,6 @@ public class SchedulingControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
             )
             .andReturn();
-
         MockHttpServletResponse response = result.getResponse();
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
     }

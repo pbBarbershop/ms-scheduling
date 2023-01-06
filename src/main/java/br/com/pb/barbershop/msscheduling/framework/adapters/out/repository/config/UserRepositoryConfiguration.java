@@ -44,3 +44,4 @@ public class UserRepositoryConfiguration {
         return new JpaTransactionManager(Objects.requireNonNull(userEntityManagerFactory.getObject()));
     }
 }
+

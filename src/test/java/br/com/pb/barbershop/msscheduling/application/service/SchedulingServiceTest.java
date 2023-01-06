@@ -143,4 +143,5 @@ public class SchedulingServiceTest {
         assertThrows(GenericException.class, () -> service.update(ID, request));
         verify(schedulingRepository, times(1)).findById(ID);
     }
+
 }

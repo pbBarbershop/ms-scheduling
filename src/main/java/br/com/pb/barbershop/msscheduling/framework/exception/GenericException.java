@@ -13,3 +13,4 @@ public class GenericException extends RuntimeException {
     private HttpStatus status;
     private String messageDTO;
 }
+

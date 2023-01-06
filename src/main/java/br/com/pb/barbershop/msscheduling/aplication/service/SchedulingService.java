@@ -9,10 +9,6 @@ import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingFilter;
 import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import br.com.pb.barbershop.msscheduling.domain.model.scheduling.Scheduling;
 import br.com.pb.barbershop.msscheduling.framework.exception.GenericException;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Example;
@@ -21,6 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
