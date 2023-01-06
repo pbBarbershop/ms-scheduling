@@ -33,13 +33,8 @@ public class SchedulingService implements SchedulingUseCase {
 
     @Override
     public SchedulingDTO create(SchedulingDTO schedulingDTO) {
-        if (schedulingDTO.getCustomerId() == null || !checkIfUserIdExists(schedulingDTO.getCustomerId())) {
-            throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente não existe.");
-        }
-        if (schedulingDTO.getBarberId() == null || !checkIfUserIdExists(schedulingDTO.getBarberId())) {
-            throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro não existe.");
-        }
-
+        checkIsCustomer(schedulingDTO.getCustomerId());
+        checkIsEmployee(schedulingDTO.getBarberId());
         schedulingValidation(schedulingDTO);
 
         var scheduling = mapper.map(schedulingDTO, Scheduling.class);
@@ -95,13 +90,8 @@ public class SchedulingService implements SchedulingUseCase {
         Scheduling scheduling = optional.get();
         scheduling.setDateTime(request.getDateTime() == null ? scheduling.getDateTime() : request.getDateTime());
 
-        if (request.getCustomerId() == null || !checkIfUserIdExists(request.getCustomerId())) {
-            throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente não existe.");
-        }
-
-        if (request.getBarberId() == null || !checkIfUserIdExists(request.getBarberId())) {
-            throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro não existe.");
-        }
+        checkIsCustomer(scheduling.getCustomerId());
+        checkIsEmployee(scheduling.getBarberId());
 
         schedulingRepository.save(scheduling);
         return mapper.map(scheduling, SchedulingDTO.class);
@@ -163,10 +153,17 @@ public class SchedulingService implements SchedulingUseCase {
             .orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Id não encontrado!"));
     }
 
-    private Boolean checkIfUserIdExists(Long userId) {
-        return userRepository.findById(userId).isPresent();
+    private void checkIsCustomer(Long id) {
+        if(id == null || userRepository.findByIdAndProfile(id, "ROLE_CUSTOMER").isEmpty()) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Cliente informado não existe!");
+        }
     }
 
+    private void checkIsEmployee(Long id) {
+        if(id == null || userRepository.findByIdAndProfile(id, "ROLE_EMPLOYEE").isEmpty()) {
+            throw new GenericException(HttpStatus.BAD_REQUEST, "Barbeiro informado não existe!");
+        }
+    }
     private Scheduling getScheduling(Long id) {
         Optional<Scheduling> scheduling = schedulingRepository.findById(id);
         return scheduling.orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Id não encontrado!"));

@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "user")
 @NonNull
 @Builder
 public class User {
@@ -23,4 +25,7 @@ public class User {
     private String email;
 
     private String phone;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Profile> profile;
 }

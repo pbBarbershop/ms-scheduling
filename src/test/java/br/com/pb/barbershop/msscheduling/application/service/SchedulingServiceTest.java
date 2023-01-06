@@ -79,12 +79,12 @@ public class SchedulingServiceTest {
     void shouldCreateScheduling_customerOrBarberDoesNotExist() {
         SchedulingDTO schedulingDTO = SchedulingMock.getSchedulingDTOMock();
 
-        when(userRepository.findById(eq(1L))).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndProfile(eq(1L), eq("ROLE_CUSTOMER"))).thenReturn(Optional.empty());
 
         assertThrows(GenericException.class, () -> service.create(schedulingDTO));
-        when(userRepository.findById(eq(1L))).thenReturn(Optional.of(UserMock.getUserMock()));
+        when(userRepository.findByIdAndProfile(eq(1L), eq("ROLE_CUSTOMER"))).thenReturn(Optional.of(UserMock.getUserMock()));
 
-        when(userRepository.findById(eq(2L))).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndProfile(eq(2L), eq("ROLE_EMPLOYEE"))).thenReturn(Optional.empty());
         assertThrows(GenericException.class, () -> service.create(schedulingDTO));
 
         schedulingDTO.setCustomerId(null);

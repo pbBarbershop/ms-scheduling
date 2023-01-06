@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepositoryPortOut {
     Optional<User> findById(Long userId);
+    Optional<User> findByIdAndProfile(Long userId, String profileName);
 }

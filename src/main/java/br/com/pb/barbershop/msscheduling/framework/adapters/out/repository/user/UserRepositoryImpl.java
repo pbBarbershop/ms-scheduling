@@ -17,4 +17,9 @@ public class UserRepositoryImpl implements UserRepositoryPortOut {
     public Optional<User> findById(Long userId) {
         return repository.findById(userId);
     }
+
+    @Override
+    public Optional<User> findByIdAndProfile(Long userId, String profileName) {
+        return repository.findByIdAndProfileName(userId, profileName);
+    }
 }
