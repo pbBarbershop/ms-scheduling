@@ -1,27 +1,26 @@
 server:
-  port: 8081
+  port: 8082
   servlet:
     context-path: /api/barbershop
-
-  error:
-    include-stacktrace: never
-
 spring:
   application:
     name: ms-scheduling
   datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
-
-    url: jdbc:mysql://localhost:3306/ms_scheduling?createDatabaseIfNotExist=true&serverTimezone=UTC
-    username: root
-    password: michelflava
-
+    scheduling:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ms_scheduling?createDatabaseIfNotExist=true&serverTimezone=UTC
+      username: root
+      password: root
+    user:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ms_user?createDatabaseIfNotExist=true&serverTimezone=UTC
+      username: root
+      password: root
   jpa:
     hibernate:
       ddl-auto: update
     generate-ddl: true
     show-sql: true
-
 springdoc:
   api-docs:
     path: /api-docs
@@ -29,7 +28,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     csrf:
-      enabled: true
-
-
+      enabled: false
+  show-actuator: true
+  default-produces-media-type: "application/json"
 

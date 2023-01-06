@@ -1,12 +1,14 @@
 package br.com.pb.barbershop.msscheduling.framework.adapters.in;
 
-import br.com.pb.barbershop.msscheduling.aplication.ports.in.SchedulingUseCase;
+import br.com.pb.barbershop.msscheduling.aplication.service.SchedulingService;
+import br.com.pb.barbershop.msscheduling.domain.dto.PageableDTO;
 import br.com.pb.barbershop.msscheduling.domain.dto.SchedulingDTO;
-import br.com.pb.barbershop.msscheduling.domain.model.Scheduling;
-import br.com.pb.barbershop.msscheduling.framework.adapters.SchedulingController;
+import br.com.pb.barbershop.msscheduling.framework.adapters.in.rest.SchedulingController;
+import br.com.pb.barbershop.msscheduling.mocks.SchedulingMock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,16 +19,13 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @WebMvcTest(controllers = SchedulingController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -36,38 +35,106 @@ public class SchedulingControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @Spy
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private SchedulingService service;
+
+    private static final Long ID = 1L;
+    private static final String URL = "/scheduling";
     private static final String ID_URL = "/scheduling/1";
 
-    private Scheduling scheduling;
+    @Test
+    void create() throws Exception {
+        SchedulingDTO scheduling = SchedulingMock.getSchedulingDTOMock();
 
-    @MockBean
-    private SchedulingUseCase schedulingService;
+        SchedulingDTO schedulingResponse = SchedulingMock.getSchedulingDTOMock();
+
+        when(service.create(scheduling)).thenReturn(schedulingResponse);
+        String json = objectMapper.writeValueAsString(scheduling);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post(URL)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        MockHttpServletResponse response = result.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+    }
 
     @Test
-    public void SchedulingControllerShouldUpdateSchedulingAndThenReturnScheduling() throws Exception {
-        SchedulingDTO schedulingDTO = getSchedulingDTO();
-
-        when(schedulingService.update(any(), any())).thenReturn(scheduling);
-
-        String input = objectMapper.writeValueAsString(schedulingDTO);
-
+    void findAll() throws Exception {
+        PageableDTO pageableDTO = new PageableDTO();
+        when(service.findAll(any(), any())).thenReturn(pageableDTO);
         MvcResult result = mockMvc
-                .perform(MockMvcRequestBuilders.put(ID_URL)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(input)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .perform(
+                        MockMvcRequestBuilders
+                                .get(URL)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andReturn();
 
         MockHttpServletResponse response = result.getResponse();
-
         assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
-    public SchedulingDTO getSchedulingDTO() {
-        return SchedulingDTO.builder().customerName("theo").customerPhone("55984072019").customerEmail("theoo@mail.com")
-                .date(LocalDate.of(2022, 12, 30)).time(LocalTime.of(15, 0)).build();
+    @Test
+    void findById() throws Exception {
+        SchedulingDTO schedulingDTO = new SchedulingDTO();
+        SchedulingDTO schedulingResponse = new SchedulingDTO();
+
+        when(service.findById(any())).thenReturn(schedulingResponse);
+        MvcResult result = mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .get(ID_URL)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn();
+
+        MockHttpServletResponse response = result.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @Test
+    void update() throws Exception {
+        SchedulingDTO schedulingDTO = SchedulingMock.getSchedulingDTOMock();
+        SchedulingDTO schedulingResponse = new SchedulingDTO();
+        when(service.update(any(), any())).thenReturn(schedulingResponse);
+        String json = objectMapper.writeValueAsString(schedulingDTO);
+        MvcResult result = mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .put(ID_URL)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn();
+        MockHttpServletResponse response = result.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @Test
+    void delete() throws Exception {
+        doNothing().when(service).delete(1L);
+
+        MvcResult result = mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .delete(ID_URL)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn();
+
+        MockHttpServletResponse response = result.getResponse();
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
     }
 }

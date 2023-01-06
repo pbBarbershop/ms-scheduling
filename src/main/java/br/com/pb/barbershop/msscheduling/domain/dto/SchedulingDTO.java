@@ -1,39 +1,42 @@
 package br.com.pb.barbershop.msscheduling.domain.dto;
+
 import br.com.pb.barbershop.msscheduling.domain.enums.Service;
+import br.com.pb.barbershop.msscheduling.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SchedulingDTO {
-    private Long id;
-    @NotBlank(message = "invalid field")
-    @Pattern(regexp = "^([a-zA-ZãÃéÉíÍóÓêÊôÔáÁ\s])+$", message = "field must contain letters only")
-    private String customerName;
-    @NotBlank(message = "invalid field")
-    @Pattern(regexp = "^[0-9]{11}+$", message = "invalid phone number")
-    private String customerPhone;
-    @Email(message = "email address must be valid")
-    private String customerEmail;
-    @NotNull(message = "invalid field")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate date;
-    @NotNull(message = "invalid field")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime time;
-    @NotBlank
-    private String barberName;
+
+    @NotNull
+    @JsonDeserialize(as = Long.class)
+    private Long customerId;
+
+    @NotNull
+    @JsonDeserialize(as = Long.class)
+    private Long barberId;
+
+    private Status status;
+
+    @NotNull(message = "Campo inválido")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime dateTime;
+
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     private Service service;
 }
-
